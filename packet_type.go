@@ -4,7 +4,7 @@ package golds
  * @Author: ZhenpengDeng(monitor1379)
  * @Date: 2020-04-26 16:41:01
  * @Last Modified by: ZhenpengDeng(monitor1379)
- * @Last Modified time: 2020-04-26 16:43:49
+ * @Last Modified time: 2020-04-26 19:28:53
  */
 
 import (
@@ -24,9 +24,9 @@ var (
 	ErrInvalidPacketType = errors.New("invalid packet type")
 )
 
-func (pt PacketType) String() string {
+func (this PacketType) String() string {
 	var s string
-	switch pt {
+	switch this {
 	case PacketTypeString:
 		s = "string"
 	case PacketTypeError:
@@ -40,5 +40,5 @@ func (pt PacketType) String() string {
 	default:
 		s = "unknown type"
 	}
-	return fmt.Sprintf("{ '%v': (%s) }", string(byte(pt)), s)
+	return fmt.Sprintf("{ '%v': (%s) }", string(byte(this)), s)
 }

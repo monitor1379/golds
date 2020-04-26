@@ -11,7 +11,7 @@ import (
  * @Author: ZhenpengDeng(monitor1379)
  * @Date: 2020-04-25 13:00:46
  * @Last Modified by: ZhenpengDeng(monitor1379)
- * @Last Modified time: 2020-04-26 16:50:12
+ * @Last Modified time: 2020-04-26 19:28:27
  */
 
 const (
@@ -23,12 +23,12 @@ type Server struct {
 }
 
 func NewServer(db *leveldb.DB) *Server {
-	s := new(Server)
-	s.db = db
-	return s
+	server := new(Server)
+	server.db = db
+	return server
 }
 
-func (s *Server) Listen(address string) error {
+func (this *Server) Listen(address string) error {
 	logger.Sugar().Infof("Server listening %s", address)
 
 	listener, err := net.Listen(defaultNetwork, address)
@@ -43,11 +43,11 @@ func (s *Server) Listen(address string) error {
 			continue
 		}
 
-		go s.handleConn(conn)
+		go this.handleConn(conn)
 	}
 }
 
-func (s *Server) handleConn(conn net.Conn) {
+func (this *Server) handleConn(conn net.Conn) {
 	defer conn.Close()
 
 	for {
