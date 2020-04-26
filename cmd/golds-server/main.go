@@ -1,5 +1,12 @@
 package main
 
+/*
+ * @Author: ZhenpengDeng(monitor1379)
+ * @Date: 2020-04-25 13:00:06
+ * @Last Modified by: ZhenpengDeng(monitor1379)
+ * @Last Modified time: 2020-04-25 13:08:59
+ */
+ 
 import (
 	"fmt"
 
@@ -8,12 +15,6 @@ import (
 	"github.com/syndtr/goleveldb/leveldb"
 )
 
-/*
- * @Author: ZhenpengDeng(monitor1379)
- * @Date: 2020-04-25 13:00:06
- * @Last Modified by: ZhenpengDeng(monitor1379)
- * @Last Modified time: 2020-04-25 13:08:59
- */
 func main() {
 	db, err := leveldb.OpenFile("./db", nil)
 	if err != nil {

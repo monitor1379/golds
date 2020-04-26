@@ -9,7 +9,7 @@ import (
  * @Author: ZhenpengDeng(monitor1379)
  * @Date: 2020-04-25 13:00:46
  * @Last Modified by: ZhenpengDeng(monitor1379)
- * @Last Modified time: 2020-04-25 13:08:13
+ * @Last Modified time: 2020-04-26 16:28:42
  */
 
 const (
@@ -25,6 +25,7 @@ func NewServer() *Server {
 }
 
 func (s *Server) Listen(address string) error {
+	logger.Sugar().Infof("Server listening %s", address)
 	listener, err := net.Listen(defaultNetwork, address)
 	if err != nil {
 		return err
