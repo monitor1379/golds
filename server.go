@@ -1,15 +1,17 @@
 package golds
 
 import (
-	"fmt"
 	"net"
+
+	"github.com/syndtr/goleveldb/leveldb"
+	"go.uber.org/zap"
 )
 
 /*
  * @Author: ZhenpengDeng(monitor1379)
  * @Date: 2020-04-25 13:00:46
  * @Last Modified by: ZhenpengDeng(monitor1379)
- * @Last Modified time: 2020-04-26 16:28:42
+ * @Last Modified time: 2020-04-26 16:50:12
  */
 
 const (
@@ -17,15 +19,18 @@ const (
 )
 
 type Server struct {
+	db *leveldb.DB
 }
 
-func NewServer() *Server {
+func NewServer(db *leveldb.DB) *Server {
 	s := new(Server)
+	s.db = db
 	return s
 }
 
 func (s *Server) Listen(address string) error {
 	logger.Sugar().Infof("Server listening %s", address)
+
 	listener, err := net.Listen(defaultNetwork, address)
 	if err != nil {
 		return err
@@ -34,15 +39,17 @@ func (s *Server) Listen(address string) error {
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
-			// TODO(monitor1379): log this error
-			fmt.Println(err)
+			logger.Error("listener accept failed", zap.Error(err))
 			continue
 		}
+
 		go s.handleConn(conn)
 	}
 }
 
 func (s *Server) handleConn(conn net.Conn) {
+	defer conn.Close()
+
 	for {
 		// Read request
 
