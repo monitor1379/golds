@@ -19,7 +19,15 @@ func TestPacketDecoder(t *testing.T) {
 	packetStrings := []string{
 		"+OK\n",
 		"-Error message\n",
+		"$5\nhello\n",
+		"$11\nhello\nworld\n",
+		"$0\n\n",
+		"$-1\n",
 	}
+
+	// TODO(monitor1379): Value(Decoded)应该是nil
+	// packet: { PacketType: { '$': (bulk string) }, Value(Decoded): "",  Array: [] }
+	// packet: { PacketType: { '$': (bulk string) }, Value(Decoded): "",  Array: [] }
 
 	for _, packetString := range packetStrings {
 		packet, err := golds.NewPacketDecoder(bytes.NewBufferString(packetString)).Decode()

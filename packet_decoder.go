@@ -9,7 +9,18 @@ package golds
 
 import (
 	"bufio"
+	"errors"
 	"io"
+)
+
+const (
+	MaxBulkBytesLength = 1024 * 1024 * 1 // 1MB
+	MaxArrayLength     = 1024 * 1024 * 1 // 1M
+)
+
+var (
+	ErrInvalidBulkBytesLength = errors.New("invalid bulk bytes length")
+	ErrTooLongBulkBytesLength = errors.New("bulk bytes length is too long")
 )
 
 type PacketDecoder struct {
@@ -60,5 +71,45 @@ func (this *PacketDecoder) decodeBytes() ([]byte, error) {
 	return data, nil
 }
 
-func (this *PacketDecoder) decodeBulkBytes() ([]byte, error) { return nil, nil }
-func (this *PacketDecoder) decodeArray() ([]*Packet, error)  { return nil, nil }
+func (this *PacketDecoder) decodeInt() (int, error) {
+	data, _, err := this.reader.ReadLine()
+	if err != nil {
+		return 0, err
+	}
+
+	n, err := Btoi64(data)
+	if err != nil {
+		return 0, err
+	}
+
+	return int(n), nil
+}
+
+func (this *PacketDecoder) decodeBulkBytes() ([]byte, error) {
+	n, err := this.decodeInt()
+	if err != nil {
+		return nil, err
+	}
+
+	if n < -1 {
+		return nil, ErrInvalidBulkBytesLength
+	}
+
+	if n == -1 {
+		return nil, nil
+	}
+
+	if n > MaxBulkBytesLength {
+		return nil, ErrTooLongBulkBytesLength
+	}
+
+	data := make([]byte, n)
+
+	_, err = this.reader.Read(data)
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
+}
+func (this *PacketDecoder) decodeArray() ([]*Packet, error) { return nil, nil }
