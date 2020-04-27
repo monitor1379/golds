@@ -35,20 +35,26 @@ func (this Packet) MustGetValueAsInt() int {
 }
 
 func (this Packet) String() string {
-
-	switch this.PacketType {
-	case PacketTypeString:
-		return fmt.Sprintf(packetStringTpl, this.PacketType, strconv.Quote(this.MustGetValueAsString()), this.Array)
-	case PacketTypeError:
-		return fmt.Sprintf(packetStringTpl, this.PacketType, strconv.Quote(this.MustGetValueAsString()), this.Array)
-	case PacketTypeInt:
-		return fmt.Sprintf(packetStringTpl, this.PacketType, this.MustGetValueAsInt(), this.Array)
-	case PacketTypeBulkString:
-		return fmt.Sprintf(packetStringTpl, this.PacketType, strconv.Quote(this.MustGetValueAsString()), this.Array)
-	case PacketTypeArray:
-		return fmt.Sprintf(packetStringTpl, this.PacketType, strconv.Quote(this.MustGetValueAsString()), this.Array)
-	default:
-		return ""
+	var valueStr string
+	if this.Value == nil {
+		valueStr = fmt.Sprintf("%+v", nil)
+	} else {
+		switch this.PacketType {
+		case PacketTypeString, PacketTypeError, PacketTypeBulkString, PacketTypeArray:
+			valueStr = strconv.Quote(this.MustGetValueAsString())
+		case PacketTypeInt:
+			valueStr = fmt.Sprintf("%d", this.MustGetValueAsInt())
+		default:
+			valueStr = fmt.Sprintf("%+v", nil)
+		}
 	}
 
+	var arrayStr string
+	if this.Array == nil {
+		arrayStr = fmt.Sprintf("%+v", nil)
+	} else {
+		arrayStr = fmt.Sprintf("%+v", this.Array)
+	}
+
+	return fmt.Sprintf(packetStringTpl, this.PacketType, valueStr, arrayStr)
 }

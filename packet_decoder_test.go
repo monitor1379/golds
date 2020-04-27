@@ -25,10 +25,6 @@ func TestPacketDecoder(t *testing.T) {
 		"$-1\n",
 	}
 
-	// TODO(monitor1379): Value(Decoded)应该是nil
-	// packet: { PacketType: { '$': (bulk string) }, Value(Decoded): "",  Array: [] }
-	// packet: { PacketType: { '$': (bulk string) }, Value(Decoded): "",  Array: [] }
-
 	for _, packetString := range packetStrings {
 		packet, err := golds.NewPacketDecoder(bytes.NewBufferString(packetString)).Decode()
 		if err != nil {
@@ -37,4 +33,5 @@ func TestPacketDecoder(t *testing.T) {
 		}
 		fmt.Println("packet:", packet)
 	}
+
 }
