@@ -4,7 +4,7 @@ package golds
  * @Author: ZhenpengDeng(monitor1379)
  * @Date: 2020-04-27 21:10:58
  * @Last Modified by: ZhenpengDeng(monitor1379)
- * @Last Modified time: 2020-04-27 23:22:41
+ * @Last Modified time: 2020-04-28 00:20:28
  */
 
 import (
@@ -41,9 +41,9 @@ func (this *Client) Set(key, value []byte) error {
 	requestPacket := goldscore.Packet{
 		PacketType: goldscore.PacketTypeArray,
 		Array: []*goldscore.Packet{
-			&goldscore.Packet{goldscore.PacketType: goldscore.PacketTypeBulkString, Value: []byte("set")},
-			&goldscore.Packet{goldscore.PacketType: goldscore.PacketTypeBulkString, Value: key},
-			&goldscore.Packet{goldscore.PacketType: goldscore.PacketTypeBulkString, Value: value},
+			&goldscore.Packet{PacketType: goldscore.PacketTypeBulkString, Value: []byte("set")},
+			&goldscore.Packet{PacketType: goldscore.PacketTypeBulkString, Value: key},
+			&goldscore.Packet{PacketType: goldscore.PacketTypeBulkString, Value: value},
 		},
 	}
 

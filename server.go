@@ -4,7 +4,7 @@ package golds
  * @Author: ZhenpengDeng(monitor1379)
  * @Date: 2020-04-25 13:00:46
  * @Last Modified by: ZhenpengDeng(monitor1379)
- * @Last Modified time: 2020-04-27 23:24:17
+ * @Last Modified time: 2020-04-28 00:57:16
  */
 
 import (
@@ -24,6 +24,7 @@ const (
 
 var (
 	ErrInvalidRequestPacketValueLength = errors.New("invalid request packet value length")
+	ErrRequestPacketRoutePathNotFound  = errors.New("requet packet route path is not found")
 )
 
 type Server struct {
@@ -35,7 +36,10 @@ func NewServer(db *leveldb.DB) *Server {
 	server := new(Server)
 	server.db = db
 	server.router = goldscore.NewRouter()
+
 	server.router.AddHandleFunc("set", handlers.Set)
+	server.router.AddHandleFunc("get", handlers.Get)
+
 	return server
 }
 
@@ -65,8 +69,8 @@ func (this *Server) handleConn(conn net.Conn) {
 		logger.Debug("connection close")
 	}()
 
-	packetEncoder := NewPacketEncoder(conn)
-	packetDecoder := NewPacketDecoder(conn)
+	packetEncoder := goldscore.NewPacketEncoder(conn)
+	packetDecoder := goldscore.NewPacketDecoder(conn)
 
 	for {
 		packet, err := packetDecoder.Decode()
@@ -82,29 +86,29 @@ func (this *Server) handleConn(conn net.Conn) {
 		logger.Debug("accept packet", zap.String("packet", packet.String()))
 
 		err = this.route(packet, packetEncoder, packetDecoder)
-
 		if err != nil {
 			logger.Error("handle request failed", zap.Error(err))
-			break
+			continue
 		}
 	}
 }
 
-func (this *Server) route(packet *Packet, packetEncoder *PacketEncoder, packetDecoder *PacketDecoder) error {
-	if len(packet.Value) == 0 {
+func (this *Server) route(packet *goldscore.Packet, packetEncoder *goldscore.PacketEncoder, packetDecoder *goldscore.PacketDecoder) error {
+	if len(packet.Array) == 0 {
 		return ErrInvalidRequestPacketValueLength
 	}
 
-	// route
-	if len(packet.Value) == 3 && string(packet.Value[0]) == "SET" {
-		// set <key> <value>
-
-	} else if len(packet.Value) == 2 && string(packet.Value[0]) == "GET" {
-		// get <key>
-
+	routePath := string(packet.Array[0].Value)
+	handleFunc, ok := this.router.Route(routePath)
+	if !ok {
+		return ErrRequestPacketRoutePathNotFound
 	}
 
-	err := packetEncoder.Encode(OKPacket)
+	// TODO(monitor1379): 如何设计这个handleFunc, context, 以及request/response
+	ctx := goldscore.NewContext()
+	handleFunc(ctx)
+
+	err := packetEncoder.Encode(goldscore.OKPacket)
 	if err != nil {
 		return err
 	}
