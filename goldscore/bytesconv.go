@@ -1,13 +1,13 @@
-package golds
-
-import "strconv"
+package goldscore
 
 /*
  * @Author: ZhenpengDeng(monitor1379)
  * @Date: 2020-04-16 21:08:08
  * @Last Modified by: ZhenpengDeng(monitor1379)
- * @Last Modified time: 2020-04-16 21:09:01
+ * @Last Modified time: 2020-04-27 23:17:39
  */
+
+import "strconv"
 
 // Btoi64: https://github.com/CodisLabs/codis/blob/release3.2/pkg/proxy/redis/decoder.go
 func Btoi64(b []byte) (int64, error) {

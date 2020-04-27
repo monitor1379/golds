@@ -1,16 +1,16 @@
-package golds_test
+package goldscore_test
 
 /*
  * @Author: ZhenpengDeng(monitor1379)
  * @Date: 2020-04-16 21:10:42
  * @Last Modified by: ZhenpengDeng(monitor1379)
- * @Last Modified time: 2020-04-26 19:41:05
+ * @Last Modified time: 2020-04-27 23:20:28
  */
 
 import (
 	"testing"
 
-	"github.com/monitor1379/golds"
+	"github.com/monitor1379/golds/goldscore"
 )
 
 func TestBtoi64(t *testing.T) {
@@ -26,7 +26,7 @@ func TestBtoi64(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		output, err := golds.Btoi64([]byte(testCase.Input))
+		output, err := goldscore.Btoi64([]byte(testCase.Input))
 		if err != nil {
 			t.Errorf("error: %s. testCase: %+v\n", err, testCase)
 		}

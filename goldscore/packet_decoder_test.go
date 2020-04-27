@@ -1,10 +1,10 @@
-package golds_test
+package goldscore_test
 
 /*
  * @Author: ZhenpengDeng(monitor1379)
  * @Date: 2020-04-26 16:47:11
  * @Last Modified by: ZhenpengDeng(monitor1379)
- * @Last Modified time: 2020-04-26 19:31:37
+ * @Last Modified time: 2020-04-27 23:21:01
  */
 
 import (
@@ -12,7 +12,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/monitor1379/golds"
+	"github.com/monitor1379/golds/goldscore"
 )
 
 func TestPacketDecoder(t *testing.T) {
@@ -29,7 +29,7 @@ func TestPacketDecoder(t *testing.T) {
 	}
 
 	for _, packetString := range packetStrings {
-		packet, err := golds.NewPacketDecoder(bytes.NewBufferString(packetString)).Decode()
+		packet, err := goldscore.NewPacketDecoder(bytes.NewBufferString(packetString)).Decode()
 		if err != nil {
 			t.Errorf("ERROR: decode error: %s", err)
 			continue

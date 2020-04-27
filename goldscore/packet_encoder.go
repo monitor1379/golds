@@ -1,11 +1,11 @@
+package goldscore
+
 /*
  * @Author: ZhenpengDeng(monitor1379)
  * @Date: 2020-04-26 16:47:46
  * @Last Modified by: ZhenpengDeng(monitor1379)
- * @Last Modified time: 2020-04-26 16:51:59
+ * @Last Modified time: 2020-04-27 23:20:06
  */
-
-package golds
 
 import (
 	"bufio"
@@ -46,6 +46,34 @@ func (this *PacketEncoder) encode(packet *Packet) error {
 	return nil
 }
 
+func (this *PacketEncoder) writeLine(data []byte) error {
+	_, err := this.writer.Write(data)
+	if err != nil {
+		return err
+	}
+
+	err = this.writer.WriteByte('\n')
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (this *PacketEncoder) writeByteLine(b byte) error {
+	err := this.writer.WriteByte(b)
+	if err != nil {
+		return err
+	}
+
+	err = this.writer.WriteByte('\n')
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (this *PacketEncoder) encodeBytes(packet *Packet) error {
 	defer this.writer.Flush()
 
@@ -54,12 +82,7 @@ func (this *PacketEncoder) encodeBytes(packet *Packet) error {
 		return err
 	}
 
-	_, err = this.writer.Write(packet.Value)
-	if err != nil {
-		return err
-	}
-
-	err = this.writer.WriteByte('\n')
+	err = this.writeLine(packet.Value)
 	if err != nil {
 		return err
 	}
@@ -76,34 +99,19 @@ func (this *PacketEncoder) encodeBulkBytes(packet *Packet) error {
 	}
 
 	if packet.Value == nil {
-		_, err = this.writer.WriteString("-1")
-		if err != nil {
-			return err
-		}
-
-		err = this.writer.WriteByte('\n')
+		err = this.writeLine([]byte("-1"))
 		if err != nil {
 			return err
 		}
 		return nil
 	}
 
-	_, err = this.writer.WriteString(strconv.Itoa(len(packet.Value)))
+	err = this.writeLine([]byte(strconv.Itoa(len(packet.Value))))
 	if err != nil {
 		return err
 	}
 
-	err = this.writer.WriteByte('\n')
-	if err != nil {
-		return err
-	}
-
-	_, err = this.writer.Write(packet.Value)
-	if err != nil {
-		return err
-	}
-
-	err = this.writer.WriteByte('\n')
+	err = this.writeLine(packet.Value)
 	if err != nil {
 		return err
 	}
@@ -113,5 +121,23 @@ func (this *PacketEncoder) encodeBulkBytes(packet *Packet) error {
 
 func (this *PacketEncoder) encodeArray(packet *Packet) error {
 	defer this.writer.Flush()
+
+	err := this.writer.WriteByte(byte(packet.PacketType))
+	if err != nil {
+		return err
+	}
+
+	err = this.writeLine([]byte(strconv.Itoa(len(packet.Array))))
+	if err != nil {
+		return err
+	}
+
+	for _, subPacket := range packet.Array {
+		err = this.encode(subPacket)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }

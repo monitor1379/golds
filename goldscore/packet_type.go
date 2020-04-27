@@ -1,4 +1,4 @@
-package golds
+package goldscore
 
 /*
  * @Author: ZhenpengDeng(monitor1379)

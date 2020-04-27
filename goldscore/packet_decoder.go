@@ -1,11 +1,11 @@
+package goldscore
+
 /*
  * @Author: ZhenpengDeng(monitor1379)
  * @Date: 2020-04-26 16:47:46
  * @Last Modified by: ZhenpengDeng(monitor1379)
- * @Last Modified time: 2020-04-26 19:40:23
+ * @Last Modified time: 2020-04-27 23:18:52
  */
-
-package golds
 
 import (
 	"bufio"
