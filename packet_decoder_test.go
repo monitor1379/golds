@@ -23,6 +23,9 @@ func TestPacketDecoder(t *testing.T) {
 		"$11\nhello\nworld\n",
 		"$0\n\n",
 		"$-1\n",
+		"*1\n:123\n",
+		"*3\n$3\nSET\n$3\nkey\n$5\nvalue\n",
+		"*0\n",
 	}
 
 	for _, packetString := range packetStrings {

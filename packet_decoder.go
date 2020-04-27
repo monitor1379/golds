@@ -19,8 +19,13 @@ const (
 )
 
 var (
+	ErrInvalidLF = errors.New("invalid line feed")
+
 	ErrInvalidBulkBytesLength = errors.New("invalid bulk bytes length")
 	ErrTooLongBulkBytesLength = errors.New("bulk bytes length is too long")
+
+	ErrInvalidArrayLength = errors.New("invalid array length")
+	ErrTooLongArrayLength = errors.New("array length is too long")
 )
 
 type PacketDecoder struct {
@@ -103,13 +108,46 @@ func (this *PacketDecoder) decodeBulkBytes() ([]byte, error) {
 		return nil, ErrTooLongBulkBytesLength
 	}
 
-	data := make([]byte, n)
+	data := make([]byte, n+1)
 
 	_, err = this.reader.Read(data)
 	if err != nil {
 		return nil, err
 	}
 
-	return data, nil
+	if data[n] != '\n' {
+		return nil, ErrInvalidLF
+	}
+
+	return data[:n], nil
 }
-func (this *PacketDecoder) decodeArray() ([]*Packet, error) { return nil, nil }
+
+func (this *PacketDecoder) decodeArray() ([]*Packet, error) {
+	n, err := this.decodeInt()
+	if err != nil {
+		return nil, err
+	}
+
+	if n < 0 {
+		return nil, ErrInvalidArrayLength
+	}
+
+	if n == 0 {
+		return []*Packet{}, nil
+	}
+
+	if n > MaxArrayLength {
+		return nil, ErrTooLongArrayLength
+	}
+
+	var packets []*Packet
+	for i := 0; i < n; i++ {
+		packet, err := this.decode()
+		if err != nil {
+			return nil, err
+		}
+		packets = append(packets, packet)
+	}
+
+	return packets, nil
+}
