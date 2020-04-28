@@ -20,12 +20,20 @@ type Packet struct {
 }
 
 var (
-	OKPacket = &Packet{PacketType: PacketTypeString, Value: []byte("OK")}
+	EmptyPacket = &Packet{PacketType: PacketTypeString, Value: []byte("empty packet")}
+	OKPacket    = &Packet{PacketType: PacketTypeString, Value: []byte("OK")}
 )
 
 const (
 	packetStringTpl = "{ PacketType: %+v, Value(Decoded): %+v,  Array: %+v }"
 )
+
+func NewStringPacket(msg string) *Packet {
+	packet := new(Packet)
+	packet.PacketType = PacketTypeString
+	packet.Value = []byte(msg)
+	return packet
+}
 
 func NewErrorPacket(msg string) *Packet {
 	buf := bytes.Buffer{}
@@ -42,6 +50,31 @@ func NewErrorPacket(msg string) *Packet {
 	packet.PacketType = PacketTypeError
 	packet.Value = buf.Bytes()
 	return packet
+}
+
+func NewIntPacket(i int) *Packet {
+	packet := new(Packet)
+	packet.PacketType = PacketTypeInt
+	packet.Value = []byte(strconv.Itoa(i))
+	return packet
+}
+
+func NewBulkStringPacket(data []byte) *Packet {
+	packet := new(Packet)
+	packet.PacketType = PacketTypeBulkString
+	packet.Value = data
+	return packet
+}
+
+func NewEmptyArrayPacket() *Packet {
+	packet := new(Packet)
+	packet.PacketType = PacketTypeArray
+	return packet
+}
+
+func (this *Packet) Add(subPacket *Packet) *Packet {
+	this.Array = append(this.Array, subPacket)
+	return this
 }
 
 func (this Packet) MustGetValueAsString() string {

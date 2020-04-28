@@ -73,7 +73,7 @@ func (this *Server) handleConn(conn net.Conn) {
 	packetDecoder := goldscore.NewPacketDecoder(conn)
 
 	for {
-		packet, err := packetDecoder.Decode()
+		requestPacket, err := packetDecoder.Decode()
 		if err == io.EOF {
 			break
 		}
@@ -83,9 +83,9 @@ func (this *Server) handleConn(conn net.Conn) {
 			break
 		}
 
-		logger.Debug("accept packet", zap.String("packet", packet.String()))
+		logger.Debug("accept packet", zap.String("packet", requestPacket.String()))
 
-		err = this.route(packet, packetEncoder, packetDecoder)
+		err = this.route(requestPacket, packetEncoder, packetDecoder)
 		if err != nil {
 			logger.Error("handle request failed", zap.Error(err))
 			continue
@@ -93,22 +93,28 @@ func (this *Server) handleConn(conn net.Conn) {
 	}
 }
 
-func (this *Server) route(packet *goldscore.Packet, packetEncoder *goldscore.PacketEncoder, packetDecoder *goldscore.PacketDecoder) error {
-	if len(packet.Array) == 0 {
+func (this *Server) route(requestPacket *goldscore.Packet, packetEncoder *goldscore.PacketEncoder, packetDecoder *goldscore.PacketDecoder) error {
+	if len(requestPacket.Array) == 0 {
 		return ErrInvalidRequestPacketValueLength
 	}
 
-	routePath := string(packet.Array[0].Value)
+	routePath := string(requestPacket.Array[0].Value)
 	handleFunc, ok := this.router.Route(routePath)
 	if !ok {
 		return ErrRequestPacketRoutePathNotFound
 	}
 
-	// TODO(monitor1379): 如何设计这个handleFunc, context, 以及request/response
-	ctx := goldscore.NewContext()
+	ctx := goldscore.NewContext(this.db, requestPacket)
+
 	handleFunc(ctx)
 
-	err := packetEncoder.Encode(goldscore.OKPacket)
+	responsePacket := ctx.GetResponsePacket()
+	if responsePacket == nil {
+		logger.Warn("handler has no response packet, filling with empty packet", zap.String("routePath", routePath))
+		responsePacket = goldscore.EmptyPacket
+	}
+
+	err := packetEncoder.Encode(responsePacket)
 	if err != nil {
 		return err
 	}

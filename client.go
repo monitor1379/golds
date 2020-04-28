@@ -8,10 +8,11 @@ package golds
  */
 
 import (
-	"errors"
+	"fmt"
 	"net"
 
 	"github.com/monitor1379/golds/goldscore"
+	"go.uber.org/zap"
 )
 
 type Client struct {
@@ -37,29 +38,48 @@ func (this *Client) Close() error {
 	return this.conn.Close()
 }
 
-func (this *Client) Set(key, value []byte) error {
-	requestPacket := goldscore.Packet{
-		PacketType: goldscore.PacketTypeArray,
-		Array: []*goldscore.Packet{
-			&goldscore.Packet{PacketType: goldscore.PacketTypeBulkString, Value: []byte("set")},
-			&goldscore.Packet{PacketType: goldscore.PacketTypeBulkString, Value: key},
-			&goldscore.Packet{PacketType: goldscore.PacketTypeBulkString, Value: value},
-		},
-	}
-
-	err := this.packetEncoder.Encode(&requestPacket)
+func (this *Client) do(requestPacket *goldscore.Packet) (*goldscore.Packet, error) {
+	err := this.packetEncoder.Encode(requestPacket)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	responsePacket, err := this.packetDecoder.Decode()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if responsePacket.PacketType == goldscore.PacketTypeError {
-		return errors.New(string(responsePacket.Value))
+		return nil, fmt.Errorf("golds server error: %s", string(responsePacket.Value))
 	}
 
+	return responsePacket, nil
+}
+
+func (this *Client) Set(key, value []byte) error {
+	requestPacket := goldscore.NewEmptyArrayPacket().
+		Add(goldscore.NewBulkStringPacket([]byte("set"))).
+		Add(goldscore.NewBulkStringPacket(key)).
+		Add(goldscore.NewBulkStringPacket(value))
+
+	responsePacket, err := this.do(requestPacket)
+	if err != nil {
+		return err
+	}
+
+	logger.Debug("response packet", zap.String("packet", responsePacket.String()))
 	return nil
+}
+
+func (this *Client) Get(key []byte) ([]byte, error) {
+	requestPacket := goldscore.NewEmptyArrayPacket().
+		Add(goldscore.NewBulkStringPacket([]byte("get"))).
+		Add(goldscore.NewBulkStringPacket(key))
+
+	responsePacket, err := this.do(requestPacket)
+	if err != nil {
+		return nil, err
+	}
+
+	return responsePacket.Value, nil
 }

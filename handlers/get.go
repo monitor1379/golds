@@ -6,8 +6,24 @@
  */
 package handlers
 
-import "github.com/monitor1379/golds/goldscore"
+import (
+	"fmt"
+
+	"github.com/monitor1379/golds/goldscore"
+)
 
 func Get(ctx *goldscore.Context) {
+	requestPacket := ctx.GetRequestPacket()
+	if len(requestPacket.Array) != 2 {
+		ctx.SetResponsePacket(goldscore.NewErrorPacket("invalid packet format for command 'get'"))
+		return
+	}
 
+	value, err := ctx.DB().Get(requestPacket.Array[1].Value, nil)
+	if err != nil {
+		ctx.SetResponsePacket(goldscore.NewErrorPacket(fmt.Sprintf("read db failed(%s)", err)))
+		return
+	}
+
+	ctx.SetResponsePacket(goldscore.NewBulkStringPacket(value))
 }
