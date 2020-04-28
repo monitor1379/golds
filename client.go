@@ -4,18 +4,20 @@ package golds
  * @Author: ZhenpengDeng(monitor1379)
  * @Date: 2020-04-27 21:10:58
  * @Last Modified by: ZhenpengDeng(monitor1379)
- * @Last Modified time: 2020-04-28 00:20:28
+ * @Last Modified time: 2020-04-28 22:53:01
  */
 
 import (
 	"fmt"
 	"net"
+	"sync"
 
 	"github.com/monitor1379/golds/goldscore"
 	"go.uber.org/zap"
 )
 
 type Client struct {
+	mu            sync.Mutex
 	conn          net.Conn
 	packetEncoder *goldscore.PacketEncoder
 	packetDecoder *goldscore.PacketDecoder
@@ -27,6 +29,7 @@ func Dial(address string) (*Client, error) {
 		return nil, err
 	}
 	client := &Client{
+		mu:            sync.Mutex{},
 		conn:          conn,
 		packetEncoder: goldscore.NewPacketEncoder(conn),
 		packetDecoder: goldscore.NewPacketDecoder(conn),
@@ -57,6 +60,9 @@ func (this *Client) do(requestPacket *goldscore.Packet) (*goldscore.Packet, erro
 }
 
 func (this *Client) Set(key, value []byte) error {
+	this.mu.Lock()
+	defer this.mu.Unlock()
+
 	requestPacket := goldscore.NewEmptyArrayPacket().
 		Add(goldscore.NewBulkStringPacket([]byte("set"))).
 		Add(goldscore.NewBulkStringPacket(key)).
@@ -72,6 +78,9 @@ func (this *Client) Set(key, value []byte) error {
 }
 
 func (this *Client) Get(key []byte) ([]byte, error) {
+	this.mu.Lock()
+	defer this.mu.Unlock()
+
 	requestPacket := goldscore.NewEmptyArrayPacket().
 		Add(goldscore.NewBulkStringPacket([]byte("get"))).
 		Add(goldscore.NewBulkStringPacket(key))

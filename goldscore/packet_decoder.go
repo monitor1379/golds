@@ -4,7 +4,7 @@ package goldscore
  * @Author: ZhenpengDeng(monitor1379)
  * @Date: 2020-04-26 16:47:46
  * @Last Modified by: ZhenpengDeng(monitor1379)
- * @Last Modified time: 2020-04-27 23:18:52
+ * @Last Modified time: 2020-04-28 23:05:53
  */
 
 import (
@@ -14,8 +14,8 @@ import (
 )
 
 const (
-	MaxBulkBytesLength = 1024 * 1024 * 1 // 1MB
-	MaxArrayLength     = 1024 * 1024 * 1 // 1M
+	MaxBulkBytesLength = 1024 * 1024 * 512 // 512MB
+	MaxArrayLength     = 1024 * 1024 * 1   // 1M
 )
 
 var (
@@ -110,7 +110,7 @@ func (this *PacketDecoder) decodeBulkBytes() ([]byte, error) {
 
 	data := make([]byte, n+1)
 
-	_, err = this.reader.Read(data)
+	_, err = io.ReadFull(this.reader, data)
 	if err != nil {
 		return nil, err
 	}
