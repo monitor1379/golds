@@ -1,8 +1,11 @@
 package main
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
+	"os"
+	"strings"
 
 	"github.com/monitor1379/golds"
 )
@@ -11,7 +14,7 @@ import (
  * @Author: ZhenpengDeng(monitor1379)
  * @Date: 2020-04-25 13:00:24
  * @Last Modified by: ZhenpengDeng(monitor1379)
- * @Last Modified time: 2020-05-01 19:56:27
+ * @Last Modified time: 2020-05-01 20:30:46
  */
 
 var (
@@ -35,9 +38,47 @@ func main() {
 
 	client, err := golds.Dial(fmt.Sprintf("%s:%d", host, port))
 	if err != nil {
-		fmt.Printf("ERROR: Connect server failed. error = '%s'.\n", err)
+		fmt.Printf("ERROR: Connect server failed. error = '%s'. \n", err)
 		return
 	}
 	fmt.Println(client)
+
+	reader := bufio.NewReader(os.Stdin)
+	for {
+		line, _, err := reader.ReadLine()
+		if err != nil {
+			fmt.Printf("ERROR: read line failed. err = '%s' .\n", err)
+			continue
+		}
+
+		commandItems := strings.Split(string(line), " ")
+		if len(commandItems) == 0 {
+			continue
+		}
+
+		executeCommand(client, commandItems)
+	}
+
+}
+
+func executeCommand(client *golds.Client, commandItems []string) {
+	commandName := strings.ToLower(commandItems[0])
+	nCommandItems := len(commandItems)
+
+	if commandName == "set" {
+		if nCommandItems != 3 {
+
+		}
+	} else if commandName == "get" {
+		if nCommandItems != 2 {
+
+		}
+	} else if commandName == "delete" {
+		if nCommandItems != 2 {
+
+		}
+	} else {
+
+	}
 
 }
