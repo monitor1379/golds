@@ -4,13 +4,16 @@ package golds
  * @Author: ZhenpengDeng(monitor1379)
  * @Date: 2020-04-27 21:10:58
  * @Last Modified by: ZhenpengDeng(monitor1379)
- * @Last Modified time: 2020-04-28 22:53:01
+ * @Last Modified time: 2020-05-01 22:16:53
  */
 
 import (
 	"fmt"
 	"net"
+	"strconv"
 	"sync"
+
+	"github.com/monitor1379/golds/handlers"
 
 	"github.com/monitor1379/golds/goldscore"
 	"go.uber.org/zap"
@@ -64,7 +67,7 @@ func (this *Client) Set(key, value []byte) error {
 	defer this.mu.Unlock()
 
 	requestPacket := goldscore.NewEmptyArrayPacket().
-		Add(goldscore.NewBulkStringPacket([]byte("set"))).
+		Add(goldscore.NewBulkStringPacket([]byte(handlers.CommandNameSet))).
 		Add(goldscore.NewBulkStringPacket(key)).
 		Add(goldscore.NewBulkStringPacket(value))
 
@@ -82,7 +85,7 @@ func (this *Client) Get(key []byte) ([]byte, error) {
 	defer this.mu.Unlock()
 
 	requestPacket := goldscore.NewEmptyArrayPacket().
-		Add(goldscore.NewBulkStringPacket([]byte("get"))).
+		Add(goldscore.NewBulkStringPacket([]byte(handlers.CommandNameGet))).
 		Add(goldscore.NewBulkStringPacket(key))
 
 	responsePacket, err := this.do(requestPacket)
@@ -91,4 +94,40 @@ func (this *Client) Get(key []byte) ([]byte, error) {
 	}
 
 	return responsePacket.Value, nil
+}
+
+func (this *Client) Del(key []byte) error {
+	this.mu.Lock()
+	defer this.mu.Unlock()
+
+	requestPacket := goldscore.NewEmptyArrayPacket().
+		Add(goldscore.NewBulkStringPacket([]byte(handlers.CommandNameDel))).
+		Add(goldscore.NewBulkStringPacket(key))
+
+	responsePacket, err := this.do(requestPacket)
+	if err != nil {
+		return err
+	}
+	_ = responsePacket
+
+	return nil
+}
+
+func (this *Client) Keys() ([]byte, error) {
+	this.mu.Lock()
+	defer this.mu.Unlock()
+
+	requestPacket := goldscore.NewEmptyArrayPacket().
+		Add(goldscore.NewBulkStringPacket([]byte(handlers.CommandNameKeys)))
+
+	responsePacket, err := this.do(requestPacket)
+	if err != nil {
+		return nil, err
+	}
+
+	for i, subPacket := range responsePacket.Array {
+		fmt.Printf("%d): %s\n", i, strconv.Quote(string(subPacket.Value)))
+	}
+
+	return nil, nil
 }

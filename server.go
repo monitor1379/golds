@@ -4,7 +4,7 @@ package golds
  * @Author: ZhenpengDeng(monitor1379)
  * @Date: 2020-04-25 13:00:46
  * @Last Modified by: ZhenpengDeng(monitor1379)
- * @Last Modified time: 2020-04-29 13:22:04
+ * @Last Modified time: 2020-05-01 22:42:33
  */
 
 import (
@@ -37,8 +37,10 @@ func NewServer(db *leveldb.DB) *Server {
 	server.db = db
 	server.router = goldscore.NewRouter()
 
-	server.router.AddHandleFunc("set", handlers.Set)
-	server.router.AddHandleFunc("get", handlers.Get)
+	server.router.AddHandleFunc(handlers.CommandNameSet, handlers.Set)
+	server.router.AddHandleFunc(handlers.CommandNameGet, handlers.Get)
+	server.router.AddHandleFunc(handlers.CommandNameDel, handlers.Del)
+	server.router.AddHandleFunc(handlers.CommandNameKeys, handlers.Keys)
 
 	return server
 }
@@ -66,7 +68,6 @@ func (this *Server) Listen(address string) error {
 func (this *Server) handleConn(conn net.Conn) {
 	defer func() {
 		conn.Close()
-		logger.Debug("connection close")
 	}()
 
 	packetEncoder := goldscore.NewPacketEncoder(conn)

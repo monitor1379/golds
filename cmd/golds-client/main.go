@@ -5,16 +5,18 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/monitor1379/golds"
+	"github.com/monitor1379/golds/handlers"
 )
 
 /*
  * @Author: ZhenpengDeng(monitor1379)
  * @Date: 2020-04-25 13:00:24
  * @Last Modified by: ZhenpengDeng(monitor1379)
- * @Last Modified time: 2020-05-01 20:30:46
+ * @Last Modified time: 2020-05-01 21:53:01
  */
 
 var (
@@ -45,6 +47,7 @@ func main() {
 
 	reader := bufio.NewReader(os.Stdin)
 	for {
+		fmt.Printf("\n(%s:%d):", host, port)
 		line, _, err := reader.ReadLine()
 		if err != nil {
 			fmt.Printf("ERROR: read line failed. err = '%s' .\n", err)
@@ -65,20 +68,50 @@ func executeCommand(client *golds.Client, commandItems []string) {
 	commandName := strings.ToLower(commandItems[0])
 	nCommandItems := len(commandItems)
 
-	if commandName == "set" {
+	if commandName == handlers.CommandNameSet {
 		if nCommandItems != 3 {
-
+			fmt.Printf("ERROR: invalid format for command 'set'. usage: set key value\n")
+			return
 		}
-	} else if commandName == "get" {
-		if nCommandItems != 2 {
-
+		err := client.Set([]byte(commandItems[1]), []byte(commandItems[2]))
+		if err != nil {
+			fmt.Printf("ERROR: %s\n", err)
+			return
 		}
-	} else if commandName == "delete" {
+		fmt.Println("OK")
+	} else if commandName == handlers.CommandNameGet {
 		if nCommandItems != 2 {
-
+			fmt.Printf("ERROR: invalid format for command 'get'. usage: get key\n")
+			return
+		}
+		value, err := client.Get([]byte(commandItems[1]))
+		if err != nil {
+			fmt.Printf("ERROR: %s\n", err)
+			return
+		}
+		fmt.Printf("1): %s\n", strconv.Quote(string(value)))
+	} else if commandName == handlers.CommandNameDel {
+		if nCommandItems != 2 {
+			fmt.Printf("ERROR: invalid format for command 'get'. usage: get key\n")
+			return
+		}
+		err := client.Del([]byte(commandItems[1]))
+		if err != nil {
+			fmt.Printf("ERROR: %s\n", err)
+			return
+		}
+		fmt.Println("OK")
+	} else if commandName == handlers.CommandNameKeys {
+		values, err := client.Keys()
+		if err != nil {
+			fmt.Printf("ERROR: %s\n", err)
+			return
+		}
+		for i, value := range values {
+			fmt.Printf("%d): %s\n", i, strconv.Quote(string(value)))
 		}
 	} else {
-
+		fmt.Printf("ERROR: unknown command")
 	}
 
 }

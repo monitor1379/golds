@@ -2,14 +2,12 @@ package handlers
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/monitor1379/golds/goldscore"
 )
 
-var (
-	k time.Duration = 0
-	i               = 0
+const (
+	CommandNameSet = "set"
 )
 
 func Set(ctx *goldscore.Context) {

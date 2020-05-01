@@ -12,6 +12,10 @@ import (
 	"github.com/monitor1379/golds/goldscore"
 )
 
+const (
+	CommandNameGet = "get"
+)
+
 func Get(ctx *goldscore.Context) {
 	requestPacket := ctx.GetRequestPacket()
 	if len(requestPacket.Array) != 2 {
