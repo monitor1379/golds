@@ -17,9 +17,9 @@ import (
  */
 
 func main() {
-	nClient := 100
+	nClient := 10
 	nKey := 1000
-	valueSize := 100
+	valueSize := 1024
 
 	keys := make([][]byte, nKey)
 	value := make([]byte, valueSize)

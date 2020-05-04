@@ -49,6 +49,7 @@ func (this *PacketDecoder) decode() (*Packet, error) {
 	}
 
 	packet := new(Packet)
+
 	packet.PacketType = PacketType(firstByte)
 
 	switch packet.PacketType {

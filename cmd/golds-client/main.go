@@ -43,8 +43,6 @@ func main() {
 		fmt.Printf("ERROR: Connect server failed. error = '%s'. \n", err)
 		return
 	}
-	fmt.Println(client)
-
 	reader := bufio.NewReader(os.Stdin)
 	for {
 		fmt.Printf("\n(%s:%d):", host, port)

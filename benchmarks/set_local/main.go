@@ -10,6 +10,7 @@ package main
 import (
 	"fmt"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/syndtr/goleveldb/leveldb"
@@ -35,10 +36,16 @@ func main() {
 		value[i] = []byte(strconv.Itoa(i % 10))[0]
 	}
 
+	var waitGroup sync.WaitGroup
 	startTime := time.Now()
 	for i := 0; i < n; i++ {
-		db.Put(keys[i], value, nil)
+		waitGroup.Add(1)
+		go func(key []byte) {
+			db.Put(key, value, nil)
+			waitGroup.Done()
+		}(keys[i])
 	}
+	waitGroup.Wait()
 	endTime := time.Now()
 	fmt.Println("total time cost:", endTime.Sub(startTime))
 }

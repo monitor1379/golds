@@ -16,7 +16,6 @@ import (
 	"github.com/monitor1379/golds/handlers"
 
 	"github.com/monitor1379/golds/goldscore"
-	"go.uber.org/zap"
 )
 
 type Client struct {
@@ -71,12 +70,11 @@ func (this *Client) Set(key, value []byte) error {
 		Add(goldscore.NewBulkStringPacket(key)).
 		Add(goldscore.NewBulkStringPacket(value))
 
-	responsePacket, err := this.do(requestPacket)
+	_, err := this.do(requestPacket)
 	if err != nil {
 		return err
 	}
 
-	logger.Debug("response packet", zap.String("packet", responsePacket.String()))
 	return nil
 }
 

@@ -18,7 +18,7 @@ var (
 	logger *zap.Logger
 )
 
-func init() {
+func initLogger() {
 	var err error
 	config := zap.NewProductionConfig()
 

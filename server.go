@@ -33,6 +33,8 @@ type Server struct {
 }
 
 func NewServer(db *leveldb.DB) *Server {
+	initLogger()
+
 	server := new(Server)
 	server.db = db
 	server.router = goldscore.NewRouter()
