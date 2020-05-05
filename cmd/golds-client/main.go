@@ -87,6 +87,10 @@ func executeCommand(client *golds.Client, commandItems []string) {
 			fmt.Printf("ERROR: %s\n", err)
 			return
 		}
+		if value == nil {
+			fmt.Printf("<nil>\n")
+			return
+		}
 		fmt.Printf("1): %s\n", strconv.Quote(string(value)))
 	} else if commandName == handlers.CommandNameDel {
 		if nCommandItems != 2 {

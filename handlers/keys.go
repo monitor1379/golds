@@ -42,4 +42,5 @@ func Keys(ctx *goldscore.Context) {
 	}
 
 	ctx.SetResponsePacket(responsePacket)
+
 }

@@ -9,6 +9,8 @@ package handlers
 import (
 	"fmt"
 
+	"github.com/syndtr/goleveldb/leveldb"
+
 	"github.com/monitor1379/golds/goldscore"
 )
 
@@ -24,6 +26,12 @@ func Get(ctx *goldscore.Context) {
 	}
 
 	value, err := ctx.DB().Get(requestPacket.Array[1].Value, nil)
+
+	if err == leveldb.ErrNotFound {
+		ctx.SetResponsePacket(goldscore.NewBulkStringPacket(nil))
+		return
+	}
+
 	if err != nil {
 		ctx.SetResponsePacket(goldscore.NewErrorPacket(fmt.Sprintf("read db failed(%s)", err)))
 		return

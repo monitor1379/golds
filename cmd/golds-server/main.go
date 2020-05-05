@@ -8,20 +8,41 @@ package main
  */
 
 import (
+	"flag"
+	"fmt"
+
 	"github.com/monitor1379/golds"
 
 	"github.com/syndtr/goleveldb/leveldb"
 )
 
+var (
+	path string
+	port int
+	help bool
+)
+
+func init() {
+	flag.StringVar(&path, "path", "./db", "database directory")
+	flag.IntVar(&port, "port", 1379, "port")
+	flag.BoolVar(&help, "help", false, "help")
+	flag.Parse()
+}
+
 func main() {
-	db, err := leveldb.OpenFile("./db", nil)
+	if help {
+		flag.Usage()
+		return
+	}
+
+	db, err := leveldb.OpenFile(path, nil)
 	if err != nil {
 		panic(err)
 	}
 
 	server := golds.NewServer(db)
 
-	err = server.Listen(":3000")
+	err = server.Listen(fmt.Sprintf(":%d", port))
 	if err != nil {
 		panic(err)
 	}
