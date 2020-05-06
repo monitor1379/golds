@@ -59,7 +59,7 @@ OK
 - `func Dial(address string) (*golds.Client, error)`: 连接服务器
 - `func (*golds.Client) Set(key, value []byte) error`: SET操作
 - `func (*golds.Client) Get(key []byte) ([]byte, error)`: GET操作
-- `func (*golds.Client) Keys([][]byte, error)`: KEYS操作
+- `func (*golds.Client) Keys() ([][]byte, error)`: KEYS操作
 
 
 示例代码:
@@ -152,7 +152,7 @@ Golds中，一个请求数据包或者一个响应数据包表示为一段字节
 - `+OK\n`: 该字节流会被解析成一个单行字符串数据包
 - `-Error: read db failed\n`: 会被解析成一个错误消息数据包
 - `:123\n`: 表示整数`123`
-- `$11\nhello\nworld\n`: 表示一个长度为11的字符串`hello\nworld`
+- `$11\nhello\nworld\n`: 表示一个长度为11的字节串`hello\nworld`
 - `*2\n:123\n$5\nhello\n`: `*2`表示接下来的是一个数组，长度为2, 第一个元素为`:123`，整数类型，内容为123。第二个元素为`$5\nhello`，一个长度为5个字节的字节串，内容为`hello`
 
 通过以上基础数据结构的序列化定义，我们可以设计命令的序列化方式。
