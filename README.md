@@ -59,7 +59,7 @@ OK
 - `func Dial(address string) (*golds.Client, error)`: 连接服务器
 - `func (*golds.Client) Set(key, value []byte) error`: SET操作
 - `func (*golds.Client) Get(key []byte) ([]byte, error)`: GET操作
-- `func (*golds.Client) Keys([][]byte, error)`: KEYS操作
+- `func (*golds.Client) Keys() ([][]byte, error)`: KEYS操作
 
 
 示例代码:
