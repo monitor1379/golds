@@ -4,13 +4,14 @@ package golds
  * @Author: ZhenpengDeng(monitor1379)
  * @Date: 2020-04-25 13:00:46
  * @Last Modified by: ZhenpengDeng(monitor1379)
- * @Last Modified time: 2020-05-01 22:42:33
+ * @Last Modified time: 2020-05-06 12:42:29
  */
 
 import (
 	"errors"
 	"io"
 	"net"
+	"strings"
 
 	"github.com/monitor1379/golds/goldscore"
 	"github.com/monitor1379/golds/handlers"
@@ -102,6 +103,7 @@ func (this *Server) route(requestPacket *goldscore.Packet, packetEncoder *goldsc
 	}
 
 	routePath := string(requestPacket.Array[0].Value)
+	routePath = strings.ToLower(routePath)
 	handleFunc, ok := this.router.Route(routePath)
 	if !ok {
 		return ErrRequestPacketRoutePathNotFound
