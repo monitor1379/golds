@@ -16,7 +16,7 @@ import (
  * @Author: ZhenpengDeng(monitor1379)
  * @Date: 2020-04-25 13:00:24
  * @Last Modified by: ZhenpengDeng(monitor1379)
- * @Last Modified time: 2020-05-01 21:53:01
+ * @Last Modified time: 2020-05-06 11:49:28
  */
 
 var (
@@ -104,13 +104,13 @@ func executeCommand(client *golds.Client, commandItems []string) {
 		}
 		fmt.Println("OK")
 	} else if commandName == handlers.CommandNameKeys {
-		values, err := client.Keys()
+		keys, err := client.Keys()
 		if err != nil {
 			fmt.Printf("ERROR: %s\n", err)
 			return
 		}
-		for i, value := range values {
-			fmt.Printf("%d): %s\n", i, strconv.Quote(string(value)))
+		for i, key := range keys {
+			fmt.Printf("%d): %s\n", i+1, strconv.Quote(string(key)))
 		}
 	} else {
 		fmt.Printf("ERROR: unknown command")

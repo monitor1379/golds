@@ -4,13 +4,12 @@ package golds
  * @Author: ZhenpengDeng(monitor1379)
  * @Date: 2020-04-27 21:10:58
  * @Last Modified by: ZhenpengDeng(monitor1379)
- * @Last Modified time: 2020-05-01 22:16:53
+ * @Last Modified time: 2020-05-06 11:48:57
  */
 
 import (
 	"fmt"
 	"net"
-	"strconv"
 	"sync"
 
 	"github.com/monitor1379/golds/handlers"
@@ -111,7 +110,7 @@ func (this *Client) Del(key []byte) error {
 	return nil
 }
 
-func (this *Client) Keys() ([]byte, error) {
+func (this *Client) Keys() ([][]byte, error) {
 	this.mu.Lock()
 	defer this.mu.Unlock()
 
@@ -123,9 +122,11 @@ func (this *Client) Keys() ([]byte, error) {
 		return nil, err
 	}
 
-	for i, subPacket := range responsePacket.Array {
-		fmt.Printf("%d): %s\n", i, strconv.Quote(string(subPacket.Value)))
+	keys := [][]byte{}
+
+	for _, subPacket := range responsePacket.Array {
+		keys = append(keys, subPacket.Value)
 	}
 
-	return nil, nil
+	return keys, nil
 }
