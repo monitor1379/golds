@@ -11,10 +11,10 @@ Golds(GO LevelDb Service)是一个轻量级的LevelDB网络服务器（协议）
 
 ```bash
 $ go get github.com/monitor1379/golds
-$ cd $GOPATH/github.com/monitor1379/golds/cmd/golds-server
+$ cd $GOPATH/src/github.com/monitor1379/golds/cmd/golds-server
 $ go build
 
-$ cd $GOPATH/github.com/monitor1379/golds/cmd/golds-client
+$ cd $GOPATH/src/github.com/monitor1379/golds/cmd/golds-client
 $ go build
 ```
 
