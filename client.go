@@ -18,7 +18,7 @@ import (
 )
 
 type Client struct {
-	mu            sync.Mutex
+	sync.Mutex
 	conn          net.Conn
 	packetEncoder *goldscore.PacketEncoder
 	packetDecoder *goldscore.PacketDecoder
@@ -30,7 +30,6 @@ func Dial(address string) (*Client, error) {
 		return nil, err
 	}
 	client := &Client{
-		mu:            sync.Mutex{},
 		conn:          conn,
 		packetEncoder: goldscore.NewPacketEncoder(conn),
 		packetDecoder: goldscore.NewPacketDecoder(conn),
@@ -61,8 +60,8 @@ func (this *Client) do(requestPacket *goldscore.Packet) (*goldscore.Packet, erro
 }
 
 func (this *Client) Set(key, value []byte) error {
-	this.mu.Lock()
-	defer this.mu.Unlock()
+	this.Lock()
+	defer this.Unlock()
 
 	requestPacket := goldscore.NewEmptyArrayPacket().
 		Add(goldscore.NewBulkStringPacket([]byte(handlers.CommandNameSet))).
@@ -78,8 +77,8 @@ func (this *Client) Set(key, value []byte) error {
 }
 
 func (this *Client) Get(key []byte) ([]byte, error) {
-	this.mu.Lock()
-	defer this.mu.Unlock()
+	this.Lock()
+	defer this.Unlock()
 
 	requestPacket := goldscore.NewEmptyArrayPacket().
 		Add(goldscore.NewBulkStringPacket([]byte(handlers.CommandNameGet))).
@@ -94,8 +93,8 @@ func (this *Client) Get(key []byte) ([]byte, error) {
 }
 
 func (this *Client) Del(key []byte) error {
-	this.mu.Lock()
-	defer this.mu.Unlock()
+	this.Lock()
+	defer this.Unlock()
 
 	requestPacket := goldscore.NewEmptyArrayPacket().
 		Add(goldscore.NewBulkStringPacket([]byte(handlers.CommandNameDel))).
@@ -111,8 +110,8 @@ func (this *Client) Del(key []byte) error {
 }
 
 func (this *Client) Keys() ([][]byte, error) {
-	this.mu.Lock()
-	defer this.mu.Unlock()
+	this.Lock()
+	defer this.Unlock()
 
 	requestPacket := goldscore.NewEmptyArrayPacket().
 		Add(goldscore.NewBulkStringPacket([]byte(handlers.CommandNameKeys)))
